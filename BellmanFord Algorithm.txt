@@ -1,0 +1,59 @@
+BellmanFord Algorithm
+import java.util.Scanner;
+
+public class BellmanFord {
+    private int[] distances;
+    private int numberOfVertices;
+    public static final int MAX_VALUE = 999;
+
+    public BellmanFord(int numberOfVertices) {
+        this.numberOfVertices = numberOfVertices;
+        distances = new int[numberOfVertices + 1];
+    }
+
+    public void bellmanFord(int source, int[][] adjacencyMatrix) {
+        for (int node = 1; node <= numberOfVertices; node++)
+            distances[node] = MAX_VALUE;
+
+        distances[source] = 0;
+
+        for (int i = 1; i <= numberOfVertices - 1; i++)
+            for (int u = 1; u <= numberOfVertices; u++)
+                for (int v = 1; v <= numberOfVertices; v++)
+                    if (adjacencyMatrix[u][v] != MAX_VALUE)
+                        distances[v] = Math.min(distances[v], distances[u] + adjacencyMatrix[u][v]);
+
+        for (int u = 1; u <= numberOfVertices; u++)
+            for (int v = 1; v <= numberOfVertices; v++)
+                if (adjacencyMatrix[u][v] != MAX_VALUE && distances[u] + adjacencyMatrix[u][v] < distances[v]) {
+                    System.out.println("Graph contains negative weight cycle");
+                    return;
+                }
+
+        System.out.println("Shortest distances from source vertex " + source + ":");
+        for (int vertex = 1; vertex <= numberOfVertices; vertex++)
+            System.out.println("To vertex " + vertex + ": " + distances[vertex]);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of vertices: ");
+        int numberOfVertices = scanner.nextInt();
+
+        int[][] adjacencyMatrix = new int[numberOfVertices + 1][numberOfVertices + 1];
+
+        System.out.println("Enter the adjacency matrix:");
+        for (int u = 1; u <= numberOfVertices; u++)
+            for (int v = 1; v <= numberOfVertices; v++)
+                adjacencyMatrix[u][v] = (u == v) ? 0 : (scanner.nextInt() == 0) ? MAX_VALUE : scanner.nextInt();
+
+        System.out.print("Enter the source vertex: ");
+        int source = scanner.nextInt();
+
+        BellmanFord bellmanFord = new BellmanFord(numberOfVertices);
+        bellmanFord.bellmanFord(source, adjacencyMatrix);
+
+        scanner.close();
+    }
+}
